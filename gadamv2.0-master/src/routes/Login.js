@@ -66,6 +66,8 @@ class Login extends React.Component {
     if (loggedInUser) {
       const foundUser = JSON.parse(loggedInUser);
       this.setState({user: foundUser});
+    } else {
+      this.handleLogout();
     }
   };
 
@@ -76,50 +78,63 @@ class Login extends React.Component {
       password: document.getElementById('exampleInputPassword1').value
     };
 
-    // axios.post('http://localhost:3000/login', request)
-    //   .then(resp => {
-    //     if (resp.data.message === 'successful login!') {
-    //       history.push("/");
-    //       return resp;
-    //     } else {
-    //       alert(resp.data.message);
-    //     }
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   })
-
-    async function checkLogin() {
-      const response = await axios.get('http://localhost:3000/login'
-      );
-
-      return new Promise(function(resolve, reject) {
-        fetch('http://localhost:3000/login', request)
-        .then(resp => {
-          if (resp.data.message === 'successful login!') {
-            history.push("/");
-            return resp;
-          } else {
-            alert(resp.data.message);
-          }
-        });
+    axios.post('http://localhost:3000/login', request)
+      .then(resp => {
+        if (resp.data.message === 'successful login!') {
+          history.push("/");
+          return resp;
+        } else {
+          alert(resp.data.message);
+        }
+      })
+      .catch(err => {
+        console.log(err);
       });
-    }
 
     // this.setState({user: this.username});
     // store the user in localStorage
-    localStorage.setItem("user", JSON.stringify(this.username));
+    // localStorage.setItem("user", JSON.stringify(this.username));
+    // var user = JSON.parse(localStorage.setItem('user'));
+    // console.log(user.username);
+    interface IUser {
+      username: "";
+      password: ""; // please don't do this in real code
+    }
+    
+    function saveCurrentUser(user: IUser): void {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+    
+    function getCurrentUser(): IUser {
+      var userStr = localStorage.getItem('currentUser');
+      try {
+        return JSON.parse(userStr);
+      } catch (ex) {
+        return null; // or do some other error handling
+      }
+    }
+    
+    var user = { username: this.state.username, password: this.state.password };
+    saveCurrentUser(user);
+    
+    // elsewhere...
+    var savedUser = getCurrentUser();
+    if (savedUser) {
+      console.log('Current user: ' + savedUser.username);
+    } else {
+      console.log('Current user not found');
+    }
   }
 
   render () {
-    if (this.state.username === !null) {
-      return (
-        <div>
-          {this.state.username} is loggged in
-          <button onClick={this.handleLogout}>logout</button>
-        </div>
-      );
-    }
+    // if (this.state.username === !null) {
+    //   return (
+    //     <div>
+    //       {this.state.username} is loggged in
+    //       <button onClick={this.handleLogout}>logout</button>
+    //     </div>
+    //   );
+    // }
   return (
     <div className="main">
     <b><p className="logintitle">Login</p></b>
